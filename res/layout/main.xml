@@ -4,9 +4,34 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </FrameLayout>
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello" />
+        android:layout_weight="0" >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.5"
+            android:onClick="startPressed"
+            android:text="Start" >
+        </Button>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.5"
+            android:onClick="stopPressed"
+            android:text="Stop" >
+        </Button>
+    </LinearLayout>
 
 </LinearLayout>
