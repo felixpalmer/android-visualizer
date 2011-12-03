@@ -21,7 +21,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * A class that draws waveform data received from a
+ * A class that draws visualizations of data received from a
  * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
  */
 class VisualizerView extends View {
@@ -30,7 +30,6 @@ class VisualizerView extends View {
   private byte[] mBytes;
   private byte[] mFFTBytes;
   private float[] mPoints;
-  private float[] mFFTPoints;
   private Rect mRect = new Rect();
 
   private Paint mCirclePaint = new Paint();
@@ -125,6 +124,7 @@ class VisualizerView extends View {
 
   BarGraphRenderer mBarGraphRendererTop;
   BarGraphRenderer mBarGraphRendererBottom;
+  CircleRenderer mCircleRenderer;
 
   @Override
   protected void onDraw(Canvas canvas) {
@@ -140,25 +140,6 @@ class VisualizerView extends View {
 
     mRect.set(0, 0, getWidth(), getHeight());
 
-    for (int i = 0; i < mBytes.length - 1; i++) {
-      float[] cartPoint = {
-          (float)i / (mBytes.length - 1),
-          mRect.height() / 2 + ((byte) (mBytes[i] + 128)) * (mRect.height() / 2) / 128
-      };
-
-      float[] polarPoint = toPolar(cartPoint);
-      mPoints[i * 4] = polarPoint[0];
-      mPoints[i * 4 + 1] = polarPoint[1];
-
-      float[] cartPoint2 = {
-          (float)(i + 1) / (mBytes.length - 1),
-          mRect.height() / 2 + ((byte) (mBytes[i + 1] + 128)) * (mRect.height() / 2) / 128
-      };
-
-      float[] polarPoint2 = toPolar(cartPoint2);
-      mPoints[i * 4 + 2] = polarPoint2[0];
-      mPoints[i * 4 + 3] = polarPoint2[1];
-    }
 
     if(mCanvasBitmap == null)
     {
@@ -178,10 +159,9 @@ class VisualizerView extends View {
       paint2.setAntiAlias(true);
       paint2.setColor(Color.argb(200, 11, 111, 233));
       mBarGraphRendererTop = new BarGraphRenderer(mCanvas, 4, paint2, true);
+
+      mCircleRenderer = new CircleRenderer(mCanvas, paint2);
     }
-
-    mCanvas.drawLines(mPoints, mCirclePaint);
-
 
     // Draw normal line - offset by amplitude
     for (int i = 0; i < mBytes.length - 1; i++) {
@@ -212,6 +192,10 @@ class VisualizerView extends View {
       mCanvas.drawLines(mPoints, mLinePaint);
     }
 
+
+    AudioData audioData = new AudioData(mBytes);
+    mCircleRenderer.render(audioData, mRect);
+
     // FFT time!!!!
     if (mFFTBytes == null) {
       return;
@@ -237,23 +221,6 @@ class VisualizerView extends View {
     }
 
     canvas.drawBitmap(mCanvasBitmap, new Matrix(), null);
-    modulation += 0.04;
   }
-
-  float modulation = 0;
-  float aggresive = 0.33f;
-  private float[] toPolar(float[] cartesian)
-  {
-    double cX = mRect.width()/2;
-    double cY = mRect.height()/2;
-    double angle = (cartesian[0]) * 2 * Math.PI;
-    double radius = ((mRect.width()/2) * (1 - aggresive) + aggresive * cartesian[1]/2) * (1.2 + Math.sin(modulation))/2.2;
-    float[] out =  {
-        (float)(cX + radius * Math.sin(angle)),
-        (float)(cY + radius * Math.cos(angle))
-    };
-    return out;
-  }
-
 
 }
