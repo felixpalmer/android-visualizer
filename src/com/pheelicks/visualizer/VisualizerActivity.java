@@ -18,12 +18,13 @@ public class VisualizerActivity extends Activity {
 
     mPlayer = MediaPlayer.create(this, R.raw.test);
     mPlayer.setLooping(true);
+    mPlayer.start();
 
     linkVisualizer(mPlayer);
   }
 
   /**
-   * Links the visualizer to  a player
+   * Links the visualizer to a player
    * TODO Refactor this into visualizer
    * @param player
    */
@@ -69,6 +70,34 @@ public class VisualizerActivity extends Activity {
     });
   }
 
+  // Cleanup
+  @Override
+  protected void onPause()
+  {
+    if (isFinishing() && (mPlayer != null))
+    {
+      mVisualizer.release();
+      mPlayer.release();
+      mPlayer = null;
+    }
+
+    super.onPause();
+  }
+
+  @Override
+  protected void onDestroy()
+  {
+    if (mPlayer != null)
+    {
+      mPlayer.stop();
+      mPlayer.release();
+      mPlayer = null;
+    }
+
+    super.onDestroy();
+  }
+
+  // Actions for buttons defined in xml
   public void startPressed(View view)
   {
     mPlayer.start();

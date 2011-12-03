@@ -35,15 +35,10 @@ class VisualizerView extends View {
 
   private Paint mCirclePaint = new Paint();
   private Paint mLinePaint = new Paint();
-  private Paint mFFTLineTopPaint = new Paint();
-  private Paint mFFTLineBottomPaint = new Paint();
   private Paint mSpecialLinePaint = new Paint();
   private Paint mProgressLinePaint = new Paint();
   private Paint mFlashPaint = new Paint();
   private Paint mFadePaint = new Paint();
-
-  final int fft_divis_top = 8; // Set to some factor of 2 to adjust number of FFT bars
-  final int fft_divis_bottom = 16; // Set to some factor of 2 to adjust number of FFT bars
 
   // Usual BS of 3 constructors
   public VisualizerView(Context context, AttributeSet attrs, int defStyle)
@@ -81,13 +76,6 @@ class VisualizerView extends View {
     mProgressLinePaint.setAntiAlias(true);
     mProgressLinePaint.setColor(Color.argb(255, 22, 131, 255));
 
-    mFFTLineTopPaint.setStrokeWidth(fft_divis_top * 3f);
-    mFFTLineTopPaint.setAntiAlias(true);
-    mFFTLineTopPaint.setColor(Color.argb(200, 233, 0, 44));
-
-    mFFTLineBottomPaint.setStrokeWidth(fft_divis_bottom * 3f);
-    mFFTLineBottomPaint.setAntiAlias(true);
-    mFFTLineBottomPaint.setColor(Color.argb(88, 0, 233, 44));
 
     mFlashPaint.setColor(Color.argb(122, 255, 255, 255));
 
@@ -134,6 +122,10 @@ class VisualizerView extends View {
   Canvas mCanvas;
   Random mRandom = new Random();
   float amplitude = 0;
+
+  BarGraphRenderer mBarGraphRendererTop;
+  BarGraphRenderer mBarGraphRendererBottom;
+
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
@@ -175,6 +167,17 @@ class VisualizerView extends View {
     if(mCanvas == null)
     {
       mCanvas = new Canvas(mCanvasBitmap);
+      Paint paint = new Paint();
+      paint.setStrokeWidth(50f);
+      paint.setAntiAlias(true);
+      paint.setColor(Color.argb(200, 233, 0, 44));
+      mBarGraphRendererBottom = new BarGraphRenderer(mCanvas, 16, paint, false);
+
+      Paint paint2 = new Paint();
+      paint2.setStrokeWidth(12f);
+      paint2.setAntiAlias(true);
+      paint2.setColor(Color.argb(200, 11, 111, 233));
+      mBarGraphRendererTop = new BarGraphRenderer(mCanvas, 4, paint2, true);
     }
 
     mCanvas.drawLines(mPoints, mCirclePaint);
@@ -214,43 +217,10 @@ class VisualizerView extends View {
       return;
     }
 
-    if (mFFTPoints == null || mFFTPoints.length < mBytes.length * 4) {
-      mFFTPoints = new float[mFFTBytes.length * 4];
-    }
+    FFTData fftData = new FFTData(mFFTBytes);
 
-    // Equalizer top
-    if(mFFTBytes != null)
-    {
-      for (int i = 0; i < mFFTBytes.length / fft_divis_top; i++) {
-        mFFTPoints[i * 4] = i * 4 * fft_divis_top;
-        mFFTPoints[i * 4 + 1] = 0;
-        mFFTPoints[i * 4 + 2] = i * 4 * fft_divis_top;
-        byte rfk = mFFTBytes[fft_divis_top * i];
-        byte ifk = mFFTBytes[fft_divis_top * i + 1];
-        float magnitude = (rfk * rfk + ifk * ifk);
-        int dbValue = (int) (10 * Math.log10(magnitude));
-        mFFTPoints[i * 4 + 3] = (dbValue * 2 - 10);
-      }
-
-      mCanvas.drawLines(mFFTPoints, mFFTLineTopPaint);
-    }
-
-    // Equalizer bottom
-    if(mFFTBytes != null)
-    {
-      for (int i = 0; i < mFFTBytes.length / fft_divis_bottom; i++) {
-        mFFTPoints[i * 4] = i * 4 * fft_divis_bottom;
-        mFFTPoints[i * 4 + 1] = mRect.height() - 2;
-        mFFTPoints[i * 4 + 2] = i * 4 * fft_divis_bottom;
-        byte rfk = mFFTBytes[fft_divis_bottom * i];
-        byte ifk = mFFTBytes[fft_divis_bottom * i + 1];
-        float magnitude = (rfk * rfk + ifk * ifk);
-        int dbValue = (int) (10 * Math.log10(magnitude));
-        mFFTPoints[i * 4 + 3] = mRect.height() - (dbValue * 4) - 2;
-      }
-
-      mCanvas.drawLines(mFFTPoints, mFFTLineBottomPaint);
-    }
+    mBarGraphRendererTop.render(fftData, mRect);
+    mBarGraphRendererBottom.render(fftData, mRect);
 
     // We totally need a thing moving along the bottom
     float cX = mRect.width()*(SystemClock.currentThreadTimeMillis() - mFlashTime)/mFlashPeriod;
