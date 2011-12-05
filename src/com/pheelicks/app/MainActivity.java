@@ -2,86 +2,73 @@ package com.pheelicks.app;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
-import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.View;
 
 import com.pheelicks.visualizer.R;
 import com.pheelicks.visualizer.VisualizerView;
 
+/**
+ * Basic demo to show how to use VisualizerView
+ *
+ */
 public class MainActivity extends Activity {
   private MediaPlayer mPlayer;
-  private Visualizer mVisualizer;
+  private VisualizerView mVisualizerView;
 
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    init();
+  }
 
+  private void init()
+  {
     mPlayer = MediaPlayer.create(this, R.raw.test);
     mPlayer.setLooping(true);
     mPlayer.start();
 
-    linkVisualizer(mPlayer);
-  }
-
-  /**
-   * Links the visualizer to a player
-   * TODO Refactor this into visualizer
-   * @param player
-   */
-  private void linkVisualizer(MediaPlayer player)
-  {
-
-    final VisualizerView visualizerView = (VisualizerView) findViewById(R.id.visualizerView);
-
-    // Create the Visualizer object and attach it to our media player.
-    mVisualizer = new Visualizer(player.getAudioSessionId());
-    mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-
-    // Pass through Visualizer data to VisualizerView
-    Visualizer.OnDataCaptureListener captureListener = new Visualizer.OnDataCaptureListener()
-    {
-      @Override
-      public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes,
-          int samplingRate)
-      {
-        visualizerView.updateVisualizer(bytes);
-      }
-
-      @Override
-      public void onFftDataCapture(Visualizer visualizer, byte[] bytes,
-          int samplingRate)
-      {
-        visualizerView.updateVisualizerFFT(bytes);
-      }
-    };
-
-    mVisualizer.setDataCaptureListener(captureListener,
-        Visualizer.getMaxCaptureRate() / 2, true, true);
-
-    // Enabled Visualizer and disable when we're done with the stream
-    mVisualizer.setEnabled(true);
-    mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-    {
-      @Override
-      public void onCompletion(MediaPlayer mediaPlayer)
-      {
-        mVisualizer.setEnabled(false);
-      }
-    });
+    mVisualizerView = (VisualizerView) findViewById(R.id.visualizerView);
+    mVisualizerView.link(mPlayer);
   }
 
   // Cleanup
+  private void cleanUp()
+  {
+    if (mPlayer != null)
+    {
+      mVisualizerView.release();
+      mPlayer.release();
+      mPlayer = null;
+    }
+  }
+
+  @Override
+  protected void onResume()
+  {
+    super.onResume();
+    if(mPlayer == null)
+    {
+      init();
+    }
+    else
+    {
+      mPlayer.start();
+    }
+  }
+
   @Override
   protected void onPause()
   {
-    if (isFinishing() && (mPlayer != null))
+    if (isFinishing())
     {
-      mVisualizer.release();
-      mPlayer.release();
-      mPlayer = null;
+      cleanUp();
+    }
+    else
+    {
+      mPlayer.pause();
     }
 
     super.onPause();
@@ -90,13 +77,7 @@ public class MainActivity extends Activity {
   @Override
   protected void onDestroy()
   {
-    if (mPlayer != null)
-    {
-      mPlayer.stop();
-      mPlayer.release();
-      mPlayer = null;
-    }
-
+    cleanUp();
     super.onDestroy();
   }
 
