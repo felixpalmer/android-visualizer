@@ -1,8 +1,5 @@
 package com.pheelicks.visualizer;
 
-// WARNING!!! This file has more magic numbers in it than you could shake a
-// stick at
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -14,29 +11,28 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.media.audiofx.Visualizer;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.pheelicks.visualizer.renderer.BarGraphRenderer;
+import com.pheelicks.visualizer.renderer.CircleRenderer;
+import com.pheelicks.visualizer.renderer.LineRenderer;
+
 /**
  * A class that draws visualizations of data received from a
- * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
+ * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture } and
+ * {@link Visualizer.OnDataCaptureListener#onFftDataCapture }
  */
 public class VisualizerView extends View {
   private static final String TAG = "VisualizerView";
 
   private byte[] mBytes;
   private byte[] mFFTBytes;
-  private float[] mPoints;
   private Rect mRect = new Rect();
 
-  private Paint mLinePaint = new Paint();
-  private Paint mSpecialLinePaint = new Paint();
-  private Paint mProgressLinePaint = new Paint();
   private Paint mFlashPaint = new Paint();
   private Paint mFadePaint = new Paint();
 
-  // Usual BS of 3 constructors
   public VisualizerView(Context context, AttributeSet attrs, int defStyle)
   {
     super(context, attrs);
@@ -55,37 +51,43 @@ public class VisualizerView extends View {
 
   private void init() {
     mBytes = null;
-
-    mProgressLinePaint.setStrokeWidth(4f);
-    mProgressLinePaint.setAntiAlias(true);
-    mProgressLinePaint.setColor(Color.argb(255, 22, 131, 255));
-
+    mFFTBytes = null;
 
     mFlashPaint.setColor(Color.argb(122, 255, 255, 255));
-
     mFadePaint.setColor(Color.argb(238, 255, 255, 255)); // Adjust alpha to change how quickly the image fades
     mFadePaint.setXfermode(new PorterDuffXfermode(Mode.MULTIPLY));
   }
 
+  /**
+   * Pass data to the visualizer. Typically this will be obtained from the
+   * Android Visualizer.OnDataCaptureListener call back. See
+   * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
+   * @param bytes
+   */
   public void updateVisualizer(byte[] bytes) {
     mBytes = bytes;
     invalidate();
   }
 
-  boolean mFlash = false;
-  long mFlashTime = 0;
-  long mFlashPeriod = 4000;
-
-  public void flash() {
-    mFlash = true;
-    long now = SystemClock.currentThreadTimeMillis();
-    mFlashPeriod = now - mFlashTime;
-    mFlashTime = now;
+  /**
+   * Pass FFT data to the visualizer. Typically this will be obtained from the
+   * Android Visualizer.OnDataCaptureListener call back. See
+   * {@link Visualizer.OnDataCaptureListener#onFftDataCapture }
+   * @param bytes
+   */
+  public void updateVisualizerFFT(byte[] bytes) {
+    mFFTBytes = bytes;
     invalidate();
   }
 
-  public void updateVisualizerFFT(byte[] bytes) {
-    mFFTBytes = bytes;
+  boolean mFlash = false;
+
+  /**
+   * Call this to make the visualizer flash. Useful for flashing at the start
+   * of a song/loop etc...
+   */
+  public void flash() {
+    mFlash = true;
     invalidate();
   }
 
@@ -101,16 +103,8 @@ public class VisualizerView extends View {
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    if (mBytes == null) {
-      return;
-    }
-
-    if (mPoints == null || mPoints.length < mBytes.length * 4) {
-      mPoints = new float[mBytes.length * 4];
-    }
-
+    // Create canvas & renderers once we're ready to draw
     mRect.set(0, 0, getWidth(), getHeight());
-
 
     if(mCanvasBitmap == null)
     {
@@ -119,6 +113,8 @@ public class VisualizerView extends View {
     if(mCanvas == null)
     {
       mCanvas = new Canvas(mCanvasBitmap);
+
+      // Now that we have a Canvas, can create Renderers
       Paint paint = new Paint();
       paint.setStrokeWidth(50f);
       paint.setAntiAlias(true);
@@ -149,22 +145,19 @@ public class VisualizerView extends View {
       mLineRenderer = new LineRenderer(mCanvas, linePaint, lineFlashPaint, true);
     }
 
-
-
-
-    AudioData audioData = new AudioData(mBytes);
-    mCircleRenderer.render(audioData, mRect);
-    mLineRenderer.render(audioData, mRect);
-
-    // FFT time!!!!
-    if (mFFTBytes == null) {
-      return;
+    if (mBytes != null) {
+      // Render all audio renderers
+      AudioData audioData = new AudioData(mBytes);
+      mCircleRenderer.render(audioData, mRect);
+      mLineRenderer.render(audioData, mRect);
     }
 
-    FFTData fftData = new FFTData(mFFTBytes);
-
-    mBarGraphRendererTop.render(fftData, mRect);
-    mBarGraphRendererBottom.render(fftData, mRect);
+    if (mFFTBytes != null) {
+      // Render all FFT renderers
+      FFTData fftData = new FFTData(mFFTBytes);
+      mBarGraphRendererTop.render(fftData, mRect);
+      mBarGraphRendererBottom.render(fftData, mRect);
+    }
 
     // Fade out old contents
     mCanvas.drawPaint(mFadePaint);
@@ -177,5 +170,4 @@ public class VisualizerView extends View {
 
     canvas.drawBitmap(mCanvasBitmap, new Matrix(), null);
   }
-
 }

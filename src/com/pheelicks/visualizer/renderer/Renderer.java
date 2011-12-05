@@ -1,4 +1,7 @@
-package com.pheelicks.visualizer;
+package com.pheelicks.visualizer.renderer;
+
+import com.pheelicks.visualizer.AudioData;
+import com.pheelicks.visualizer.FFTData;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
