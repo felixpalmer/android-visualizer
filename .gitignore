@@ -18,3 +18,4 @@ gen/
 local.properties
 
 .DS_Store
+.settings/
