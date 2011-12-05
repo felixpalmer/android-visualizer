@@ -3,8 +3,6 @@ package com.pheelicks.visualizer;
 // WARNING!!! This file has more magic numbers in it than you could shake a
 // stick at
 
-import java.util.Random;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -58,14 +56,6 @@ public class VisualizerView extends View {
   private void init() {
     mBytes = null;
 
-    mLinePaint.setStrokeWidth(1f);
-    mLinePaint.setAntiAlias(true);
-    mLinePaint.setColor(Color.argb(88, 0, 128, 255));
-
-    mSpecialLinePaint.setStrokeWidth(5f);
-    mSpecialLinePaint.setAntiAlias(true);
-    mSpecialLinePaint.setColor(Color.argb(188, 255, 255, 255));
-
     mProgressLinePaint.setStrokeWidth(4f);
     mProgressLinePaint.setAntiAlias(true);
     mProgressLinePaint.setColor(Color.argb(255, 22, 131, 255));
@@ -79,7 +69,6 @@ public class VisualizerView extends View {
 
   public void updateVisualizer(byte[] bytes) {
     mBytes = bytes;
-    rotateColours();
     invalidate();
   }
 
@@ -100,25 +89,13 @@ public class VisualizerView extends View {
     invalidate();
   }
 
-
-  float colorCounter = 0;
-  private void rotateColours()
-  {
-    int r = (int)Math.floor(128*(Math.sin(colorCounter) + 1));
-    int g = (int)Math.floor(128*(Math.sin(colorCounter + 2) + 1));
-    int b = (int)Math.floor(128*(Math.sin(colorCounter + 4) + 1));
-    mLinePaint.setColor(Color.argb(128, r, g, b));
-    colorCounter += 0.03;
-  }
-
   Bitmap mCanvasBitmap;
   Canvas mCanvas;
-  Random mRandom = new Random();
-  float amplitude = 0;
 
   BarGraphRenderer mBarGraphRendererTop;
   BarGraphRenderer mBarGraphRendererBottom;
   CircleRenderer mCircleRenderer;
+  LineRenderer mLineRenderer;
 
   @Override
   protected void onDraw(Canvas canvas) {
@@ -158,42 +135,26 @@ public class VisualizerView extends View {
       paint3.setStrokeWidth(3f);
       paint3.setAntiAlias(true);
       paint3.setColor(Color.argb(255, 222, 92, 143));
-
       mCircleRenderer = new CircleRenderer(mCanvas, paint3, true);
+
+      Paint linePaint = new Paint();
+      linePaint.setStrokeWidth(1f);
+      linePaint.setAntiAlias(true);
+      linePaint.setColor(Color.argb(88, 0, 128, 255));
+
+      Paint lineFlashPaint = new Paint();
+      lineFlashPaint.setStrokeWidth(5f);
+      lineFlashPaint.setAntiAlias(true);
+      lineFlashPaint.setColor(Color.argb(188, 255, 255, 255));
+      mLineRenderer = new LineRenderer(mCanvas, linePaint, lineFlashPaint, true);
     }
 
-    // Draw normal line - offset by amplitude
-    for (int i = 0; i < mBytes.length - 1; i++) {
-      mPoints[i * 4] = mRect.width() * i / (mBytes.length - 1);
-      mPoints[i * 4 + 1] =  mRect.height() / 2
-          + ((byte) (mBytes[i] + 128)) * (mRect.height() / 3) / 128;
-      mPoints[i * 4 + 2] = mRect.width() * (i + 1) / (mBytes.length - 1);
-      mPoints[i * 4 + 3] = mRect.height() / 2
-          + ((byte) (mBytes[i + 1] + 128)) * (mRect.height() / 3) / 128;
-    }
 
-    // Calc amplitude for this waveform
-    float accumulator = 0;
-    for (int i = 0; i < mBytes.length - 1; i++) {
-      accumulator += Math.abs(mBytes[i]);
-    }
-
-    float amp = accumulator/(128 * mBytes.length);
-    if(amp > amplitude)
-    {
-      amplitude = amp;
-      // Occassionally, make a prominent line
-      mCanvas.drawLines(mPoints, mSpecialLinePaint);
-    }
-    else
-    {
-      amplitude *= 0.99;
-      mCanvas.drawLines(mPoints, mLinePaint);
-    }
 
 
     AudioData audioData = new AudioData(mBytes);
     mCircleRenderer.render(audioData, mRect);
+    mLineRenderer.render(audioData, mRect);
 
     // FFT time!!!!
     if (mFFTBytes == null) {
@@ -204,11 +165,6 @@ public class VisualizerView extends View {
 
     mBarGraphRendererTop.render(fftData, mRect);
     mBarGraphRendererBottom.render(fftData, mRect);
-
-    // We totally need a thing moving along the bottom
-    float cX = mRect.width()*(SystemClock.currentThreadTimeMillis() - mFlashTime)/mFlashPeriod;
-
-    mCanvas.drawLine(cX - 35, mRect.height(), cX, mRect.height(), mProgressLinePaint);
 
     // Fade out old contents
     mCanvas.drawPaint(mFadePaint);
