@@ -28,14 +28,9 @@ public class LineRenderer extends Renderer
    * @param paint - Paint to draw lines with
    * @param paint - Paint to draw flash with
    */
-  public LineRenderer(Canvas canvas,
-                      Paint paint,
-                      Paint flashPaint)
+  public LineRenderer(Paint paint, Paint flashPaint)
   {
-    this(canvas,
-         paint,
-         flashPaint,
-         false);
+    this(paint, flashPaint, false);
   }
 
   /**
@@ -45,19 +40,18 @@ public class LineRenderer extends Renderer
    * @param paint - Paint to draw flash with
    * @param cycleColor - If true the color will change on each frame
    */
-  public LineRenderer(Canvas canvas,
-                      Paint paint,
+  public LineRenderer(Paint paint,
                       Paint flashPaint,
                       boolean cycleColor)
   {
-    super(canvas);
+    super();
     mPaint = paint;
     mFlashPaint = flashPaint;
     mCycleColor = cycleColor;
   }
 
   @Override
-  public void onRender(AudioData data, Rect rect)
+  public void onRender(Canvas canvas, AudioData data, Rect rect)
   {
     if(mCycleColor)
     {
@@ -85,18 +79,18 @@ public class LineRenderer extends Renderer
     {
       // Amplitude is bigger than normal, make a prominent line
       amplitude = amp;
-      mCanvas.drawLines(mPoints, mFlashPaint);
+      canvas.drawLines(mPoints, mFlashPaint);
     }
     else
     {
       // Amplitude is nothing special, reduce the amplitude
       amplitude *= 0.99;
-      mCanvas.drawLines(mPoints, mPaint);
+      canvas.drawLines(mPoints, mPaint);
     }
   }
 
   @Override
-  public void onRender(FFTData data, Rect rect)
+  public void onRender(Canvas canvas, FFTData data, Rect rect)
   {
     // Do nothing, we only display audio data
   }

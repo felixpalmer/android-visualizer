@@ -24,12 +24,9 @@ public class CircleRenderer extends Renderer
    * @param canvas
    * @param paint - Paint to draw lines with
    */
-  public CircleRenderer(Canvas canvas,
-                          Paint paint)
+  public CircleRenderer(Paint paint)
   {
-    this(canvas,
-         paint,
-         false);
+    this(paint, false);
   }
 
   /**
@@ -38,17 +35,15 @@ public class CircleRenderer extends Renderer
    * @param paint - Paint to draw lines with
    * @param cycleColor - If true the color will change on each frame
    */
-  public CircleRenderer(Canvas canvas,
-                        Paint paint,
-                        boolean cycleColor)
+  public CircleRenderer(Paint paint, boolean cycleColor)
   {
-    super(canvas);
+    super();
     mPaint = paint;
     mCycleColor = cycleColor;
   }
 
   @Override
-  public void onRender(AudioData data, Rect rect)
+  public void onRender(Canvas canvas, AudioData data, Rect rect)
   {
     if(mCycleColor)
     {
@@ -75,14 +70,14 @@ public class CircleRenderer extends Renderer
       mPoints[i * 4 + 3] = polarPoint2[1];
     }
 
-    mCanvas.drawLines(mPoints, mPaint);
+    canvas.drawLines(mPoints, mPaint);
 
     // Controls the pulsing rate
     modulation += 0.04;
   }
 
   @Override
-  public void onRender(FFTData data, Rect rect)
+  public void onRender(Canvas canvas, FFTData data, Rect rect)
   {
     // Do nothing, we only display audio data
   }

@@ -185,19 +185,19 @@ public class VisualizerView extends View {
       paint.setStrokeWidth(50f);
       paint.setAntiAlias(true);
       paint.setColor(Color.argb(200, 233, 0, 44));
-      mBarGraphRendererBottom = new BarGraphRenderer(mCanvas, 16, paint, false);
+      mBarGraphRendererBottom = new BarGraphRenderer(16, paint, false);
 
       Paint paint2 = new Paint();
       paint2.setStrokeWidth(12f);
       paint2.setAntiAlias(true);
       paint2.setColor(Color.argb(200, 11, 111, 233));
-      mBarGraphRendererTop = new BarGraphRenderer(mCanvas, 4, paint2, true);
+      mBarGraphRendererTop = new BarGraphRenderer(4, paint2, true);
 
       Paint paint3 = new Paint();
       paint3.setStrokeWidth(3f);
       paint3.setAntiAlias(true);
       paint3.setColor(Color.argb(255, 222, 92, 143));
-      mCircleRenderer = new CircleRenderer(mCanvas, paint3, true);
+      mCircleRenderer = new CircleRenderer(paint3, true);
 
       Paint linePaint = new Paint();
       linePaint.setStrokeWidth(1f);
@@ -208,21 +208,21 @@ public class VisualizerView extends View {
       lineFlashPaint.setStrokeWidth(5f);
       lineFlashPaint.setAntiAlias(true);
       lineFlashPaint.setColor(Color.argb(188, 255, 255, 255));
-      mLineRenderer = new LineRenderer(mCanvas, linePaint, lineFlashPaint, true);
+      mLineRenderer = new LineRenderer(linePaint, lineFlashPaint, true);
     }
 
     if (mBytes != null) {
       // Render all audio renderers
       AudioData audioData = new AudioData(mBytes);
-      mCircleRenderer.render(audioData, mRect);
-      mLineRenderer.render(audioData, mRect);
+      mCircleRenderer.render(mCanvas, audioData, mRect);
+      mLineRenderer.render(mCanvas, audioData, mRect);
     }
 
     if (mFFTBytes != null) {
       // Render all FFT renderers
       FFTData fftData = new FFTData(mFFTBytes);
-      mBarGraphRendererTop.render(fftData, mRect);
-      mBarGraphRendererBottom.render(fftData, mRect);
+      mBarGraphRendererTop.render(mCanvas, fftData, mRect);
+      mBarGraphRendererBottom.render(mCanvas, fftData, mRect);
     }
 
     // Fade out old contents
