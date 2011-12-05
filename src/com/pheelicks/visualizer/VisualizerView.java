@@ -24,7 +24,7 @@ import android.view.View;
  * A class that draws visualizations of data received from a
  * {@link Visualizer.OnDataCaptureListener#onWaveFormDataCapture }
  */
-class VisualizerView extends View {
+public class VisualizerView extends View {
   private static final String TAG = "VisualizerView";
 
   private byte[] mBytes;

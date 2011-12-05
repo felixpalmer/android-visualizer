@@ -1,4 +1,4 @@
-package com.pheelicks.visualizer;
+package com.pheelicks.app;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
@@ -6,7 +6,10 @@ import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.View;
 
-public class VisualizerActivity extends Activity {
+import com.pheelicks.visualizer.R;
+import com.pheelicks.visualizer.VisualizerView;
+
+public class MainActivity extends Activity {
   private MediaPlayer mPlayer;
   private Visualizer mVisualizer;
 
