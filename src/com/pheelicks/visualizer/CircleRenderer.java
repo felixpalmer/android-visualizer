@@ -1,12 +1,14 @@
 package com.pheelicks.visualizer;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 public class CircleRenderer extends Renderer
 {
   private Paint mPaint;
+  private boolean mCycleColor;
 
   /**
    * Renders the audio data onto a pulsing circle
@@ -16,13 +18,34 @@ public class CircleRenderer extends Renderer
   public CircleRenderer(Canvas canvas,
                           Paint paint)
   {
+    this(canvas,
+         paint,
+         false);
+  }
+
+  /**
+   * Renders the audio data onto a pulsing circle
+   * @param canvas
+   * @param paint - Paint to draw lines with
+   * @param cycleColor - If true the color will change on each frame
+   */
+  public CircleRenderer(Canvas canvas,
+                        Paint paint,
+                        boolean cycleColor)
+  {
     super(canvas);
     mPaint = paint;
+    mCycleColor = cycleColor;
   }
 
   @Override
   public void onRender(AudioData data, Rect rect)
   {
+    if(mCycleColor)
+    {
+      cycleColor();
+    }
+
     for (int i = 0; i < data.bytes.length - 1; i++) {
       float[] cartPoint = {
           (float)i / (data.bytes.length - 1),
@@ -68,5 +91,15 @@ public class CircleRenderer extends Renderer
         (float)(cY + radius * Math.cos(angle))
     };
     return out;
+  }
+
+  private float colorCounter = 0;
+  private void cycleColor()
+  {
+    int r = (int)Math.floor(128*(Math.sin(colorCounter) + 1));
+    int g = (int)Math.floor(128*(Math.sin(colorCounter + 2) + 1));
+    int b = (int)Math.floor(128*(Math.sin(colorCounter + 4) + 1));
+    mPaint.setColor(Color.argb(128, r, g, b));
+    colorCounter += 0.03;
   }
 }

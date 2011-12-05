@@ -32,7 +32,6 @@ class VisualizerView extends View {
   private float[] mPoints;
   private Rect mRect = new Rect();
 
-  private Paint mCirclePaint = new Paint();
   private Paint mLinePaint = new Paint();
   private Paint mSpecialLinePaint = new Paint();
   private Paint mProgressLinePaint = new Paint();
@@ -58,10 +57,6 @@ class VisualizerView extends View {
 
   private void init() {
     mBytes = null;
-
-    mCirclePaint.setStrokeWidth(3f);
-    mCirclePaint.setAntiAlias(true);
-    mCirclePaint.setColor(Color.argb(255, 222, 92, 143));
 
     mLinePaint.setStrokeWidth(1f);
     mLinePaint.setAntiAlias(true);
@@ -113,7 +108,6 @@ class VisualizerView extends View {
     int g = (int)Math.floor(128*(Math.sin(colorCounter + 2) + 1));
     int b = (int)Math.floor(128*(Math.sin(colorCounter + 4) + 1));
     mLinePaint.setColor(Color.argb(128, r, g, b));
-    mCirclePaint.setColor(Color.argb(255, g, b, r));
     colorCounter += 0.03;
   }
 
@@ -160,7 +154,12 @@ class VisualizerView extends View {
       paint2.setColor(Color.argb(200, 11, 111, 233));
       mBarGraphRendererTop = new BarGraphRenderer(mCanvas, 4, paint2, true);
 
-      mCircleRenderer = new CircleRenderer(mCanvas, paint2);
+      Paint paint3 = new Paint();
+      paint3.setStrokeWidth(3f);
+      paint3.setAntiAlias(true);
+      paint3.setColor(Color.argb(255, 222, 92, 143));
+
+      mCircleRenderer = new CircleRenderer(mCanvas, paint3, true);
     }
 
     // Draw normal line - offset by amplitude
