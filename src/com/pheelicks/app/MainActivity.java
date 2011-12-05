@@ -1,3 +1,9 @@
+/**
+ * Copyright 2011, Felix Palmer
+ *
+ * Licensed under the MIT license:
+ * http://creativecommons.org/licenses/MIT/
+ */
 package com.pheelicks.app;
 
 import android.app.Activity;

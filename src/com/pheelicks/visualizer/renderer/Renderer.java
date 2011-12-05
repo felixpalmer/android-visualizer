@@ -1,10 +1,16 @@
+/**
+ * Copyright 2011, Felix Palmer
+ *
+ * Licensed under the MIT license:
+ * http://creativecommons.org/licenses/MIT/
+ */
 package com.pheelicks.visualizer.renderer;
-
-import com.pheelicks.visualizer.AudioData;
-import com.pheelicks.visualizer.FFTData;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+
+import com.pheelicks.visualizer.AudioData;
+import com.pheelicks.visualizer.FFTData;
 
 abstract public class Renderer
 {
