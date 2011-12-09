@@ -6,6 +6,8 @@
  */
 package com.pheelicks.app;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,8 +22,7 @@ import com.pheelicks.visualizer.renderer.CircleRenderer;
 import com.pheelicks.visualizer.renderer.LineRenderer;
 
 /**
- * Basic demo to show how to use VisualizerView
- *
+ * Demo to show how to use VisualizerView
  */
 public class MainActivity extends Activity {
   private MediaPlayer mPlayer;
@@ -32,7 +33,27 @@ public class MainActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+  }
+
+  @Override
+  protected void onResume()
+  {
+    super.onResume();
     init();
+  }
+
+  @Override
+  protected void onPause()
+  {
+    cleanUp();
+    super.onPause();
+  }
+
+  @Override
+  protected void onDestroy()
+  {
+    cleanUp();
+    super.onDestroy();
   }
 
   private void init()
@@ -41,6 +62,8 @@ public class MainActivity extends Activity {
     mPlayer.setLooping(true);
     mPlayer.start();
 
+    // We need to link the visualizer view to the media player so that
+    // it displays something
     mVisualizerView = (VisualizerView) findViewById(R.id.visualizerView);
     mVisualizerView.link(mPlayer);
 
@@ -48,6 +71,17 @@ public class MainActivity extends Activity {
     addLineRenderer();
   }
 
+  private void cleanUp()
+  {
+    if (mPlayer != null)
+    {
+      mVisualizerView.release();
+      mPlayer.release();
+      mPlayer = null;
+    }
+  }
+
+  // Methods for adding renderers to visualizer
   private void addBarGraphRenderers()
   {
     Paint paint = new Paint();
@@ -90,56 +124,14 @@ public class MainActivity extends Activity {
     mVisualizerView.addRenderer(lineRenderer);
   }
 
-  // Cleanup
-  private void cleanUp()
-  {
-    if (mPlayer != null)
-    {
-      mVisualizerView.release();
-      mPlayer.release();
-      mPlayer = null;
-    }
-  }
-
-  @Override
-  protected void onResume()
-  {
-    super.onResume();
-    if(mPlayer == null)
-    {
-      init();
-    }
-    else
-    {
-      mPlayer.start();
-    }
-  }
-
-  @Override
-  protected void onPause()
-  {
-    if (isFinishing())
-    {
-      cleanUp();
-    }
-    else
-    {
-      mPlayer.pause();
-    }
-
-    super.onPause();
-  }
-
-  @Override
-  protected void onDestroy()
-  {
-    cleanUp();
-    super.onDestroy();
-  }
-
   // Actions for buttons defined in xml
-  public void startPressed(View view)
+  public void startPressed(View view) throws IllegalStateException, IOException
   {
+    if(mPlayer.isPlaying())
+    {
+      return;
+    }
+    mPlayer.prepare();
     mPlayer.start();
   }
 
