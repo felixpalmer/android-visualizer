@@ -6,6 +6,9 @@
  */
 package com.pheelicks.visualizer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -21,9 +24,7 @@ import android.media.audiofx.Visualizer;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.pheelicks.visualizer.renderer.BarGraphRenderer;
-import com.pheelicks.visualizer.renderer.CircleRenderer;
-import com.pheelicks.visualizer.renderer.LineRenderer;
+import com.pheelicks.visualizer.renderer.Renderer;
 
 /**
  * A class that draws visualizations of data received from a
@@ -37,6 +38,8 @@ public class VisualizerView extends View {
   private byte[] mFFTBytes;
   private Rect mRect = new Rect();
   private Visualizer mVisualizer;
+
+  private Set<Renderer> mRenderers;
 
   private Paint mFlashPaint = new Paint();
   private Paint mFadePaint = new Paint();
@@ -64,6 +67,8 @@ public class VisualizerView extends View {
     mFlashPaint.setColor(Color.argb(122, 255, 255, 255));
     mFadePaint.setColor(Color.argb(238, 255, 255, 255)); // Adjust alpha to change how quickly the image fades
     mFadePaint.setXfermode(new PorterDuffXfermode(Mode.MULTIPLY));
+
+    mRenderers = new HashSet<Renderer>();
   }
 
   /**
@@ -114,6 +119,19 @@ public class VisualizerView extends View {
     });
   }
 
+  public void addRenderer(Renderer renderer)
+  {
+    if(renderer != null)
+    {
+      mRenderers.add(renderer);
+    }
+  }
+
+  public void clearRenderers()
+  {
+    mRenderers.clear();
+  }
+
   /**
    * Call to release the resources used by VisualizerView. Like with the
    * MediaPlayer it is good practice to call this method
@@ -122,7 +140,6 @@ public class VisualizerView extends View {
   {
     mVisualizer.release();
   }
-
 
   /**
    * Pass data to the visualizer. Typically this will be obtained from the
@@ -160,16 +177,12 @@ public class VisualizerView extends View {
   Bitmap mCanvasBitmap;
   Canvas mCanvas;
 
-  BarGraphRenderer mBarGraphRendererTop;
-  BarGraphRenderer mBarGraphRendererBottom;
-  CircleRenderer mCircleRenderer;
-  LineRenderer mLineRenderer;
 
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    // Create canvas & renderers once we're ready to draw
+    // Create canvas once we're ready to draw
     mRect.set(0, 0, getWidth(), getHeight());
 
     if(mCanvasBitmap == null)
@@ -179,50 +192,24 @@ public class VisualizerView extends View {
     if(mCanvas == null)
     {
       mCanvas = new Canvas(mCanvasBitmap);
-
-      // Now that we have a Canvas, can create Renderers
-      Paint paint = new Paint();
-      paint.setStrokeWidth(50f);
-      paint.setAntiAlias(true);
-      paint.setColor(Color.argb(200, 233, 0, 44));
-      mBarGraphRendererBottom = new BarGraphRenderer(16, paint, false);
-
-      Paint paint2 = new Paint();
-      paint2.setStrokeWidth(12f);
-      paint2.setAntiAlias(true);
-      paint2.setColor(Color.argb(200, 11, 111, 233));
-      mBarGraphRendererTop = new BarGraphRenderer(4, paint2, true);
-
-      Paint paint3 = new Paint();
-      paint3.setStrokeWidth(3f);
-      paint3.setAntiAlias(true);
-      paint3.setColor(Color.argb(255, 222, 92, 143));
-      mCircleRenderer = new CircleRenderer(paint3, true);
-
-      Paint linePaint = new Paint();
-      linePaint.setStrokeWidth(1f);
-      linePaint.setAntiAlias(true);
-      linePaint.setColor(Color.argb(88, 0, 128, 255));
-
-      Paint lineFlashPaint = new Paint();
-      lineFlashPaint.setStrokeWidth(5f);
-      lineFlashPaint.setAntiAlias(true);
-      lineFlashPaint.setColor(Color.argb(188, 255, 255, 255));
-      mLineRenderer = new LineRenderer(linePaint, lineFlashPaint, true);
     }
 
     if (mBytes != null) {
       // Render all audio renderers
       AudioData audioData = new AudioData(mBytes);
-      mCircleRenderer.render(mCanvas, audioData, mRect);
-      mLineRenderer.render(mCanvas, audioData, mRect);
+      for(Renderer r : mRenderers)
+      {
+        r.render(mCanvas, audioData, mRect);
+      }
     }
 
     if (mFFTBytes != null) {
       // Render all FFT renderers
       FFTData fftData = new FFTData(mFFTBytes);
-      mBarGraphRendererTop.render(mCanvas, fftData, mRect);
-      mBarGraphRendererBottom.render(mCanvas, fftData, mRect);
+      for(Renderer r : mRenderers)
+      {
+        r.render(mCanvas, fftData, mRect);
+      }
     }
 
     // Fade out old contents

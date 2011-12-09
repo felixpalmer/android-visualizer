@@ -28,6 +28,48 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:layout_weight="0.25"
+            android:onClick="barPressed"
+            android:text="Bar" >
+        </Button>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.25"
+            android:onClick="circlePressed"
+            android:text="Circle" >
+        </Button>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.25"
+            android:onClick="linePressed"
+            android:text="Line" >
+        </Button>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.25"
+            android:onClick="allPressed"
+            android:text="All" >
+        </Button>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0" >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:layout_weight="0.5"
             android:onClick="startPressed"
             android:text="Start" >
