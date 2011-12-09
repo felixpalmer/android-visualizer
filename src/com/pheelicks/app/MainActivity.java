@@ -87,14 +87,14 @@ public class MainActivity extends Activity {
     Paint paint = new Paint();
     paint.setStrokeWidth(50f);
     paint.setAntiAlias(true);
-    paint.setColor(Color.argb(200, 233, 0, 44));
+    paint.setColor(Color.argb(200, 56, 138, 252));
     BarGraphRenderer barGraphRendererBottom = new BarGraphRenderer(16, paint, false);
     mVisualizerView.addRenderer(barGraphRendererBottom);
 
     Paint paint2 = new Paint();
     paint2.setStrokeWidth(12f);
     paint2.setAntiAlias(true);
-    paint2.setColor(Color.argb(200, 11, 111, 233));
+    paint2.setColor(Color.argb(200, 181, 111, 233));
     BarGraphRenderer barGraphRendererTop = new BarGraphRenderer(4, paint2, true);
     mVisualizerView.addRenderer(barGraphRendererTop);
   }
