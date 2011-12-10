@@ -47,6 +47,15 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="0.25"
+            android:onClick="circleBarPressed"
+            android:text="Circle Bar" >
+        </Button>
+            
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.25"
             android:onClick="linePressed"
             android:text="Line" >
         </Button>
@@ -56,8 +65,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="0.25"
-            android:onClick="allPressed"
-            android:text="All" >
+            android:onClick="clearPressed"
+            android:text="Clear" >
         </Button>
     </LinearLayout>
 

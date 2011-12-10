@@ -11,6 +11,8 @@ import java.io.IOException;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.view.View;
 import com.pheelicks.visualizer.R;
 import com.pheelicks.visualizer.VisualizerView;
 import com.pheelicks.visualizer.renderer.BarGraphRenderer;
+import com.pheelicks.visualizer.renderer.CircleBarRenderer;
 import com.pheelicks.visualizer.renderer.CircleRenderer;
 import com.pheelicks.visualizer.renderer.LineRenderer;
 
@@ -99,13 +102,24 @@ public class MainActivity extends Activity {
     mVisualizerView.addRenderer(barGraphRendererTop);
   }
 
+  private void addCircleBarRenderer()
+  {
+    Paint paint = new Paint();
+    paint.setStrokeWidth(8f);
+    paint.setAntiAlias(true);
+    paint.setXfermode(new PorterDuffXfermode(Mode.LIGHTEN));
+    paint.setColor(Color.argb(255, 222, 92, 143));
+    CircleBarRenderer circleBarRenderer = new CircleBarRenderer(paint, 32, true);
+    mVisualizerView.addRenderer(circleBarRenderer);
+  }
+
   private void addCircleRenderer()
   {
-    Paint paint3 = new Paint();
-    paint3.setStrokeWidth(3f);
-    paint3.setAntiAlias(true);
-    paint3.setColor(Color.argb(255, 222, 92, 143));
-    CircleRenderer circleRenderer = new CircleRenderer(paint3, true);
+    Paint paint = new Paint();
+    paint.setStrokeWidth(3f);
+    paint.setAntiAlias(true);
+    paint.setColor(Color.argb(255, 222, 92, 143));
+    CircleRenderer circleRenderer = new CircleRenderer(paint, true);
     mVisualizerView.addRenderer(circleRenderer);
   }
 
@@ -142,27 +156,26 @@ public class MainActivity extends Activity {
 
   public void barPressed(View view)
   {
-    mVisualizerView.clearRenderers();
     addBarGraphRenderers();
   }
 
   public void circlePressed(View view)
   {
-    mVisualizerView.clearRenderers();
     addCircleRenderer();
+  }
+
+  public void circleBarPressed(View view)
+  {
+    addCircleBarRenderer();
   }
 
   public void linePressed(View view)
   {
-    mVisualizerView.clearRenderers();
     addLineRenderer();
   }
 
-  public void allPressed(View view)
+  public void clearPressed(View view)
   {
     mVisualizerView.clearRenderers();
-    addBarGraphRenderers();
-    addCircleRenderer();
-    addLineRenderer();
   }
 }
