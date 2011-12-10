@@ -2,6 +2,8 @@
 
 A View subclass that Takes the input from the Android MediaPlayer and displays visualizations, like in iTunes or WinAmp
 
+The Visualizer is designed to be modular, so it is very easy to combine visualizations to create more complex effects.
+
 ## Examples
 
 It's easy to create your own custom visualizations or combine/edit existing ones. Below are a few examples:
