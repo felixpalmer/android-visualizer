@@ -17,6 +17,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 
+import com.pheelicks.utils.TunnelPlayerWorkaround;
 import com.pheelicks.visualizer.R;
 import com.pheelicks.visualizer.VisualizerView;
 import com.pheelicks.visualizer.renderer.BarGraphRenderer;
@@ -29,6 +30,7 @@ import com.pheelicks.visualizer.renderer.LineRenderer;
  */
 public class MainActivity extends Activity {
   private MediaPlayer mPlayer;
+  private MediaPlayer mSilentPlayer;  /* to avoid tunnel player issue */
   private VisualizerView mVisualizerView;
 
   /** Called when the activity is first created. */
@@ -42,6 +44,7 @@ public class MainActivity extends Activity {
   protected void onResume()
   {
     super.onResume();
+    initTunnelPlayerWorkaround();
     init();
   }
 
@@ -81,6 +84,30 @@ public class MainActivity extends Activity {
       mVisualizerView.release();
       mPlayer.release();
       mPlayer = null;
+    }
+    
+    if (mSilentPlayer != null)
+    {
+      mSilentPlayer.release();
+      mSilentPlayer = null;
+    }
+  }
+  
+  // Workaround (for Galaxy S4)
+  //
+  // "Visualization does not work on the new Galaxy devices"
+  //    https://github.com/felixpalmer/android-visualizer/issues/5
+  //
+  // NOTE: 
+  //   This code is not required for visualizing default "test.mp3" file,
+  //   because tunnel player is used when duration is longer than 1 minute.
+  //   (default "test.mp3" file: 8 seconds)
+  //
+  private void initTunnelPlayerWorkaround() {
+    // Read "tunnel.decode" system property to determine
+    // the workaround is needed
+    if (TunnelPlayerWorkaround.isTunnelDecodeEnabled(this)) {
+      mSilentPlayer = TunnelPlayerWorkaround.createSilentMediaPlayer(this);
     }
   }
 
