@@ -5,66 +5,67 @@
     android:background="@drawable/bg"
     android:orientation="vertical" >
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/visualizerView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
         android:layout_weight="1"
-        android:background="#000" >
+        android:background="#000"
+        android:orientation="vertical" >
 
-        <com.pheelicks.visualizer.VisualizerView
-            android:id="@+id/visualizerView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
-        </com.pheelicks.visualizer.VisualizerView>
-    </FrameLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0" >
+        android:layout_weight="0.07"
+        android:paddingBottom="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp" >
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="0.09"
             android:onClick="barPressed"
             android:text="Bar" >
         </Button>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="0.08"
             android:onClick="circlePressed"
             android:text="Circle" >
         </Button>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="0.09"
             android:onClick="circleBarPressed"
             android:text="Circle Bar" >
         </Button>
             
         <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="0.11"
             android:onClick="linePressed"
             android:text="Line" >
         </Button>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="0.25"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="0.13"
             android:onClick="clearPressed"
             android:text="Clear" >
         </Button>
@@ -76,18 +77,18 @@
         android:layout_weight="0" >
 
         <Button
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="2dp"
             android:layout_weight="0.5"
             android:onClick="startPressed"
             android:text="Start" >
         </Button>
 
         <Button
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="2dp"
             android:layout_weight="0.5"
             android:onClick="stopPressed"
             android:text="Stop" >

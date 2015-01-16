@@ -55,12 +55,12 @@ public class BarGraphRenderer extends Renderer
       if(mTop)
       {
         mFFTPoints[i * 4 + 1] = 0;
-        mFFTPoints[i * 4 + 3] = (dbValue * 2 - 10);
+        mFFTPoints[i * 4 + 3] = (dbValue * 10 - 10);
       }
       else
       {
         mFFTPoints[i * 4 + 1] = rect.height();
-        mFFTPoints[i * 4 + 3] = rect.height() - (dbValue * 2 - 10);
+        mFFTPoints[i * 4 + 3] = rect.height() - (dbValue * 10 - 10);
       }
     }
 
