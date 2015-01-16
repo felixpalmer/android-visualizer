@@ -53,10 +53,10 @@ public class LineRenderer extends Renderer
   @Override
   public void onRender(Canvas canvas, AudioData data, Rect rect)
   {
-    if(mCycleColor)
-    {
-      cycleColor();
-    }
+//    if(mCycleColor)
+//    {
+//      cycleColor();
+//    }
 
     // Calculate points for line
     for (int i = 0; i < data.bytes.length - 1; i++) {
@@ -75,18 +75,20 @@ public class LineRenderer extends Renderer
     }
 
     float amp = accumulator/(128 * data.bytes.length);
-    if(amp > amplitude)
-    {
-      // Amplitude is bigger than normal, make a prominent line
-      amplitude = amp;
-      canvas.drawLines(mPoints, mFlashPaint);
-    }
-    else
-    {
+//    if(amp > amplitude)
+//    {
+//      // Amplitude is bigger than normal, make a prominent line
+//      amplitude = amp;
+//      canvas.drawLines(mPoints, mFlashPaint);
+//    }
+//    else
+//    {
       // Amplitude is nothing special, reduce the amplitude
+    
+    mPaint.setColor(Color.argb(255, 255, 255, 255));
       amplitude *= 0.99;
       canvas.drawLines(mPoints, mPaint);
-    }
+//    }
   }
 
   @Override
