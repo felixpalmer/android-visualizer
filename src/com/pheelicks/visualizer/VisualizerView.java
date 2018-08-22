@@ -83,7 +83,12 @@ public class VisualizerView extends View {
     }
 
     // Create the Visualizer object and attach it to our media player.
+    if(mVisualizer != null) 
+    {
+      release();
+    }
     mVisualizer = new Visualizer(player.getAudioSessionId());
+    mVisualizer.setEnabled(false);
     mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
 
     // Pass through Visualizer data to VisualizerView
